@@ -1,0 +1,9 @@
+services:
+  quiz-bot:
+    build: .
+    container_name: quiz_bot
+    restart: always
+
+    volumes:
+      - ./images:/app/images
+      - ./countries.csv:/app/countries.csv
