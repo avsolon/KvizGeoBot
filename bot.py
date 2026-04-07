@@ -91,48 +91,40 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ===== обработка =====
 async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
     query = update.callback_query
     await query.answer()
 
     data_cb = query.data
-    print("CLICK:", data_cb)
-
     user_data = context.user_data
 
-    # ===== МЕНЮ =====
+    # ===== в меню =====
     if data_cb == "menu":
         user_data.clear()
         await query.message.edit_text("Главное меню:", reply_markup=main_menu())
         return
 
-    # ===== РЕЖИМ =====
-    if data_cb == "mode_capital":
-        mode = "capital"
-    elif data_cb == "mode_country":
-        mode = "country"
-    else:
-        mode = None
-
-    if mode:
+    # ===== выбор режима =====
+    if data_cb.startswith("mode"):
+        mode = data_cb.split("_")[1]
         user_data.clear()
         user_data["mode"] = mode
 
         keyboard = [
-            [InlineKeyboardButton("10 вопросов", callback_data="start_10")],
-            [InlineKeyboardButton("20 вопросов", callback_data="start_20")],
-            [InlineKeyboardButton("30 вопросов", callback_data="start_30")],
-            [InlineKeyboardButton("♾ Безлимит", callback_data="start_inf")],
-            [InlineKeyboardButton("🏠 В меню", callback_data="menu")]
+            [InlineKeyboardButton(f"{n} вопросов", callback_data=f"start_{n}")]
+            for n in [10, 20, 30]
         ]
 
+        # 👇 добавляем безлимит
+        keyboard.append([InlineKeyboardButton("♾ Безлимит", callback_data="start_inf")])
+        keyboard.append([InlineKeyboardButton("🏠 В меню", callback_data="menu")])
+
         await query.message.edit_text(
-            "Сколько вопросов?",
+            "Выбери количество вопросов?",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
         return
 
-    # ===== БЕЗЛИМИТ ВЫБОР =====
+    # ===== старт =====
     if data_cb == "start_inf":
         keyboard = [
             [InlineKeyboardButton("1 ошибка", callback_data="inf_1")],
@@ -147,30 +139,28 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # ===== БЕЗЛИМИТ СТАРТ =====
-    if data_cb.startswith("inf_"):
+    if data_cb.startswith("inf"):
         user_data.clear()
+
+        mode = data_cb.split("_")[1]
 
         user_data["infinite"] = True
         user_data["score"] = 0
 
-        if data_cb == "inf_1":
+        if mode == "1":
             user_data["lives"] = 1
-        elif data_cb == "inf_3":
+        elif mode == "3":
             user_data["lives"] = 3
-        elif data_cb == "inf_time":
-            import time
+        elif mode == "time":
             user_data["time_mode"] = True
             user_data["end_time"] = time.time() + 60
 
         await send_question(query, context)
         return
 
-    # ===== ОБЫЧНЫЙ СТАРТ =====
-    if data_cb.startswith("start_"):
+    if data_cb.startswith("start"):
         total = int(data_cb.split("_")[1])
 
-        user_data.clear()
         user_data["infinite"] = False
         user_data["total"] = total
         user_data["left"] = total
@@ -179,7 +169,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_question(query, context)
         return
 
-    # ===== ОТВЕТ =====
+    # ===== ответ =====
     if data_cb.startswith("ans"):
         if user_data.get("answered"):
             return
@@ -190,169 +180,41 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         answers = user_data["answers"]
         correct = user_data["correct"]
 
-        is_correct = answers[idx] == correct
-
-        if is_correct:
+        if answers[idx] == correct:
             user_data["score"] += 1
             text = "✅ Верно!"
         else:
-            text = f"❌ Неверно!\n<b>{correct}</b>"
+            text = f"❌ Неверно!\nПравильный ответ: <b>{correct}</b>"
 
-        await query.message.reply_text(text, parse_mode="HTML")
+        await query.message.reply_text(
+            text,
+            parse_mode="HTML"
+        )
 
-        # ===== БЕЗЛИМИТ =====
-        if user_data.get("infinite"):
-
-            if "lives" in user_data:
-                if not is_correct:
-                    user_data["lives"] -= 1
-
-                if user_data["lives"] <= 0:
-                    await finish_game(query, context)
-                    return
-
-            if user_data.get("time_mode"):
-                import time
-                if time.time() >= user_data["end_time"]:
-                    await finish_game(query, context)
-                    return
-
-            await send_question(query, context)
-            return
-
-        # ===== ОБЫЧНЫЙ =====
         user_data["left"] -= 1
 
         if user_data["left"] > 0:
             await send_question(query, context)
         else:
-            await finish_game(query, context)
+            score = user_data["score"]
+            total = user_data["total"]
 
-# async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     query = update.callback_query
-#     await query.answer()
-#
-#     data_cb = query.data
-#     user_data = context.user_data
-#
-#     # ===== в меню =====
-#     if data_cb == "menu":
-#         user_data.clear()
-#         await query.message.edit_text("Главное меню:", reply_markup=main_menu())
-#         return
-#
-#     # ===== выбор режима =====
-#     if data_cb.startswith("mode"):
-#         mode = data_cb.split("_")[1]
-#         user_data.clear()
-#         user_data["mode"] = mode
-#
-#         keyboard = [
-#             [InlineKeyboardButton(f"{n} вопросов", callback_data=f"start_{n}")]
-#             for n in [10, 20, 30]
-#         ]
-#
-#         # 👇 добавляем безлимит
-#         keyboard.append([InlineKeyboardButton("♾ Безлимит", callback_data="start_inf")])
-#         keyboard.append([InlineKeyboardButton("🏠 В меню", callback_data="menu")])
-#
-#         await query.message.edit_text(
-#             "Выбери количество вопросов?",
-#             reply_markup=InlineKeyboardMarkup(keyboard)
-#         )
-#         return
-#
-#     # ===== старт =====
-#     if data_cb == "start_inf":
-#         keyboard = [
-#             [InlineKeyboardButton("1 ошибка", callback_data="inf_1")],
-#             [InlineKeyboardButton("3 ошибки", callback_data="inf_3")],
-#             [InlineKeyboardButton("⏱ На время", callback_data="inf_time")],
-#             [InlineKeyboardButton("🏠 В меню", callback_data="menu")]
-#         ]
-#
-#         await query.message.edit_text(
-#             "Выбери режим:",
-#             reply_markup=InlineKeyboardMarkup(keyboard)
-#         )
-#         return
-#
-#     if data_cb.startswith("inf"):
-#         user_data.clear()
-#
-#         mode = data_cb.split("_")[1]
-#
-#         user_data["infinite"] = True
-#         user_data["score"] = 0
-#
-#         if mode == "1":
-#             user_data["lives"] = 1
-#         elif mode == "3":
-#             user_data["lives"] = 3
-#         elif mode == "time":
-#             user_data["time_mode"] = True
-#             user_data["end_time"] = time.time() + 60
-#
-#         await send_question(query, context)
-#         return
-#
-#     if data_cb.startswith("start"):
-#         total = int(data_cb.split("_")[1])
-#
-#         user_data["infinite"] = False
-#         user_data["total"] = total
-#         user_data["left"] = total
-#         user_data["score"] = 0
-#
-#         await send_question(query, context)
-#         return
-#
-#     # ===== ответ =====
-#     if data_cb.startswith("ans"):
-#         if user_data.get("answered"):
-#             return
-#
-#         user_data["answered"] = True
-#
-#         idx = int(data_cb.split("_")[1])
-#         answers = user_data["answers"]
-#         correct = user_data["correct"]
-#
-#         if answers[idx] == correct:
-#             user_data["score"] += 1
-#             text = "✅ Верно!"
-#         else:
-#             text = f"❌ Неверно!\nПравильный ответ: <b>{correct}</b>"
-#
-#         await query.message.reply_text(
-#             text,
-#             parse_mode="HTML"
-#         )
-#
-#         user_data["left"] -= 1
-#
-#         if user_data["left"] > 0:
-#             await send_question(query, context)
-#         else:
-#             score = user_data["score"]
-#             total = user_data["total"]
-#
-#             # финальное сообщение
-#             await query.message.reply_text(
-#                 f"🎉 <b>Квиз завершён!</b>\n\n"
-#                     f"📊 Результат: <b>{score}/{total}</b>\n"
-#                     f"🔥 Точность: <b>{int(score/total*100)}%</b>",
-#                 parse_mode="HTML"
-#             )
-#
-#             # пауза 3 секунды
-#             await asyncio.sleep(3)
-#
-#             # возврат в меню
-#             await query.message.reply_text(
-#                 "Главное меню:",
-#                 reply_markup=main_menu()
-#             )
+            # финальное сообщение
+            await query.message.reply_text(
+                f"🎉 <b>Квиз завершён!</b>\n\n"
+                    f"📊 Результат: <b>{score}/{total}</b>\n"
+                    f"🔥 Точность: <b>{int(score/total*100)}%</b>",
+                parse_mode="HTML"
+            )
+
+            # пауза 3 секунды
+            await asyncio.sleep(3)
+
+            # возврат в меню
+            await query.message.reply_text(
+                "Главное меню:",
+                reply_markup=main_menu()
+            )
 
 
 # ===== отправка вопроса =====
