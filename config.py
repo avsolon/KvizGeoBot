@@ -1,6 +1,6 @@
 QUIZ_TOPICS = {
     "capital": {
-        "file": "data/countries.csv",
+        "file": "data/countries_full.csv",
         "question_field": "Страна",
         "answer_field": "Столица",
         "image_field": "Картинка",
@@ -9,7 +9,7 @@ QUIZ_TOPICS = {
     },
 
     "country": {
-        "file": "data/countries.csv",
+        "file": "data/countries_full.csv",
         "question_field": "Столица",
         "answer_field": "Страна",
         "image_field": "Картинка",
@@ -18,7 +18,7 @@ QUIZ_TOPICS = {
     },
 
     "flags": {
-        "file": "data/countries.csv",
+        "file": "data/countries_full.csv",
         "question_field": "Страна",
         "answer_field": "Страна",
         "image_field": "Флаг",

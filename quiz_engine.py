@@ -34,12 +34,44 @@ class QuizEngine:
         answers = wrong + [correct]
         random.shuffle(answers)
 
+        # 🔥 обработка изображения (флаг / картинка)
+        image = row.get(cfg["image_field"], "").strip()
+        if not image:
+            image = None
+
         return {
             "question": cfg["question_text"].format(
                 question=row[cfg["question_field"]]
             ),
             "correct": correct,
             "answers": answers,
-            "image": row.get(cfg["image_field"]),
+            "image": image,
             "image_folder": cfg["image_folder"]
         }
+
+    # def generate(self, topic):
+    #     cfg = self.config[topic]
+    #     data = self.load_data(topic)
+    #
+    #     row = random.choice(data)
+    #
+    #     correct = row[cfg["answer_field"]]
+    #
+    #     pool = list({
+    #         d[cfg["answer_field"]]
+    #         for d in data
+    #         if d[cfg["answer_field"]] != correct
+    #     })
+    #
+    #     wrong = random.sample(pool, min(3, len(pool)))
+    #     answers = wrong + [correct]
+    #     random.shuffle(answers)
+    #
+    #     return {
+    #         "question": cfg["question_text"].format(
+    #             question=row[cfg["question_field"]]
+    #         ),
+    #         "correct": correct,
+    #         "answers": answers,
+    #         "image_folder": cfg["image_folder"]
+    #     }
