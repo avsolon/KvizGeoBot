@@ -26,12 +26,14 @@ QUIZ_TOPICS = {
         "question_text": "🚩 Чей это флаг?"
     },
 
-    "rivers": {
-        "file": "data/rivers.csv",
-        "question_field": "Река",
-        "answer_field": "Страна",
-        "image_field": None,
-        "image_folder": None,
-        "question_text": "🌊 Где находится река <b>{question}</b>?"
-    }
+    "water": {
+    "file": "data/water_quiz_pro.csv",
+    "type": "quiz",
+    "question_field": "Вопрос",
+    "correct_field": "Правильный",
+    "wrong_fields": ["Неверный1", "Неверный2", "Неверный3"],
+    "image_field": "Картинка",
+    "image_folder": "images/water"
+}
+
 }

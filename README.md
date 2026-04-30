@@ -17,11 +17,15 @@
     ├── bot.py
     ├── quiz_engine.py
     ├── config.py
-    ├── countries_full.csv
+    ├── data/
+    │   └── files.csv
     ├── images/
+    │   ├── countries/
     │   └── flags/
     ├── .env
     ├── requirements.txt
+    ├── README.md
+    ├── Dockerfile
     └── docker-compose.yml
 
 ## 🧠 Архитектура
