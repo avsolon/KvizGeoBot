@@ -27,13 +27,23 @@ QUIZ_TOPICS = {
     },
 
     "water": {
-    "file": "data/water_quiz_pro.csv",
-    "type": "quiz",
-    "question_field": "Вопрос",
-    "correct_field": "Правильный",
-    "wrong_fields": ["Неверный1", "Неверный2", "Неверный3"],
-    "image_field": "Картинка",
-    "image_folder": "images/water"
-}
+        "file": "data/water_quiz_pro.csv",
+        "type": "quiz",
+        "question_field": "Вопрос",
+        "correct_field": "Правильный",
+        "wrong_fields": ["Неверный1", "Неверный2", "Неверный3"],
+        "image_field": "Картинка",
+        "image_folder": "images/water"
+    },
+
+    "space": {
+        "file": "data/space.csv",
+        "type": "quiz",
+        "question_field": "Вопрос",
+        "correct_field": "Правильный",
+        "wrong_fields": ["Неверный1", "Неверный2", "Неверный3"],
+        "image_field": "Картинка",
+        "image_folder": "images/space"
+    }
 
 }
