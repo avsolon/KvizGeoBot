@@ -29,7 +29,7 @@ def main_menu():
         [InlineKeyboardButton("🏙 Столицы", callback_data="topic_capital")],
         [InlineKeyboardButton("🌍 Страны", callback_data="topic_country")],
         [InlineKeyboardButton("🚩 Флаги", callback_data="topic_flags")],
-        [InlineKeyboardButton("🌊 Реки", callback_data="topic_rivers")]
+        [InlineKeyboardButton("🌊 Водная стихия", callback_data="topic_water")]
     ])
 
 def reply_menu():
