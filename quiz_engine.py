@@ -22,6 +22,32 @@ class QuizEngine:
 
         row = random.choice(data)
 
+        # ===== quiz water =====
+        if cfg.get("type") == "quiz":
+            correct = row[cfg["correct_field"]]
+
+            wrong = [
+                row[field]
+                for field in cfg["wrong_fields"]
+                if row.get(field)
+            ]
+
+            answers = wrong + [correct]
+            random.shuffle(answers)
+
+            image = row.get(cfg["image_field"], "").strip()
+            if not image:
+                image = None
+
+            return {
+                "question": row[cfg["question_field"]],
+                "correct": correct,
+                "answers": answers,
+                "image": image,
+                "image_folder": cfg["image_folder"]
+            }
+
+        # ===== страны, столицы, флаги =====
         correct = row[cfg["answer_field"]]
 
         pool = list({
@@ -34,7 +60,6 @@ class QuizEngine:
         answers = wrong + [correct]
         random.shuffle(answers)
 
-        # 🔥 обработка изображения (флаг / картинка)
         image = row.get(cfg["image_field"], "").strip()
         if not image:
             image = None
@@ -67,11 +92,17 @@ class QuizEngine:
     #     answers = wrong + [correct]
     #     random.shuffle(answers)
     #
+    #     # 🔥 обработка изображения (флаг / картинка)
+    #     image = row.get(cfg["image_field"], "").strip()
+    #     if not image:
+    #         image = None
+    #
     #     return {
     #         "question": cfg["question_text"].format(
     #             question=row[cfg["question_field"]]
     #         ),
     #         "correct": correct,
     #         "answers": answers,
+    #         "image": image,
     #         "image_folder": cfg["image_folder"]
     #     }
